@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    
+  }
+}
+
+body {
+   
+ 
+}
+
+.mapboxgl-popup-content {
+  background-color: #000000 !important; /* Arka planı siyah yap */
+  color: #ffffff !important; /* Yazı rengini beyaz yap */
+  padding: 3 !important; /* İç boşluğu sıfırla */
+  border-radius: 4px; /* Köşeleri yuvarlat */
+  box-shadow: none; /* Gölgeyi kaldır */
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: #000000 !important; /* Ok ucunun rengini siyah yap */
+}
+

@@ -1,0 +1,19 @@
+.relative {
+    position: relative;
+  }
+  
+  label {
+    position: absolute;
+    left: 12px; /* Gerekirse ayarlayın */
+    top: 50%; /* Yükseklik ayarı */
+    transform: translateY(-50%); /* Dikey ortalama */
+    transition: all 0.2s ease;
+    color: gray; /* Varsayılan renk */
+  }
+  
+  input:focus + label,
+  input:not(:placeholder-shown) + label {
+    top: -10px; /* Yukarı kaydırma */
+    font-size: 12px; /* Küçültme */
+    color: #002E67; /* Renk değişimi */
+  }

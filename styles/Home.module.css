@@ -1,0 +1,29 @@
+.background {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('/background.webp');
+  background-size: cover;
+  background-position: center;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0; /* Yazıyı en alta taşır */
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center; /* Dikey olarak ortalar */
+  justify-content: center; /* Yatay olarak ortalar */
+  padding-bottom: 20px; /* Alt kenardan biraz boşluk bırakır */
+  background: rgba(0, 0, 0, 0.3); /* Hafif bir karartma efekti */
+  color: white;
+  text-align: center;
+}
+
+.title {
+  font-size: 10rem; /* İstenilen büyüklüğe göre değiştirilebilir */
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Yazıya gölge ekler */
+}
