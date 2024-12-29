@@ -1,14 +1,33 @@
 import axios from 'axios'
+import { AxiosError } from 'axios';
 
-export interface CreditCard{
-   
+export interface CreditCardDetail{
+  id:number,
+  cardType:number,
+  cardHolderName:string,
+  cardNumber:string
 }
 
+export interface AddCreditCard{
+  userId:number,
+  cardNumber:string,
+  cardHolderName:string,
+  expireMonth:string,
+  expireYear:string,
+  cardType: number;
+  id?: number;
+}
+
+export interface AddCreditCardResponse {
+  data: AddCreditCard;
+  message: string;
+  success: boolean;
+}
 
 export const CreditCardService={
 
  
-   getUserCards: async (userId: number): Promise<CreditCard[]> => {
+   getUserCards: async (userId: number): Promise<CreditCardDetail[]> => {
     try {
       const response = await axios.get(`http://localhost:5153/api/Cards/getUserCards`, {
         params: { userId },
@@ -20,6 +39,27 @@ export const CreditCardService={
     }
   },
 
+  addCreditCard:async(card:AddCreditCard):Promise<AddCreditCardResponse>=>{
+    try {
+      const response = await axios.post(
+        "http://localhost:5153/api/Cards/addCard", 
+        card, 
+        { headers: { "Content-Type": "application/json" } }
+      );
+      console.log('Kart başarıyla eklendi:', response.data);
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error('Kart eklenirken hata oluştu:', error.response?.data); // Backend'den dönen detaylı hata mesajı
+        console.error('Hata mesajı:', error.message);
+        console.error('Hata kodu:', error.code);
+        console.error('Hata yanıtı:', error.response);
+      } else {
+        console.error('Beklenmedik bir hata oluştu:', error);
+      }
+      throw error;
+    }
+  }
 
 
 };
