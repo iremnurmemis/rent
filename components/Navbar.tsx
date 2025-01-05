@@ -79,7 +79,7 @@ function Navbar() {
                   <Link href="/rentals">Sürüş Geçmişim</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  <Link href="/profile">Ödeme Geçmişim</Link>
+                  <Link href="/payments">Ödeme Geçmişim</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   <Link href="/payment-tool">Ödeme Araçlarım</Link>
