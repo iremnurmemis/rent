@@ -4,7 +4,7 @@ import React from 'react'
 
 function CreditCardPage() {
   return (
-    <div className='mt-24'><CreditCard/></div>
+    <div className='mt-20'><CreditCard/></div>
   )
 }
 

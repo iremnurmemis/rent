@@ -226,12 +226,21 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
           // Marker tıklama durumunda seçilen aracı güncelle
           marker.getElement().addEventListener("click", () => {
             setSelectedCar(car);
+            setSelectedCarDistance(distance);
+            setSelectedCarDuration(duration);
             setShowCard(true); // Kartı göster
           });
         }
       });
     }
   }, [carLocations]);
+
+  useEffect(() => {
+    if (selectedCar) {
+      // SelectedCar değiştiğinde mesafe ve süreyi ayarla
+      // Gerekirse burada mesafe ve süreyi yeniden hesaplayabilirsiniz.
+    }
+  }, [selectedCar]);
 
   useEffect(() => {
     if (selectedCar != null) {
@@ -287,6 +296,20 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
     setCurrentIndex(index);
   };
 
+  const handleCarSelect = (carId: number) => {
+    localStorage.setItem('selectedCarId', carId.toString());
+    window.location.href = '/credit-card';
+  };
+
+  const goToCreditCardPage=()=>{
+    if(selectedCar){
+      localStorage.setItem('selectedCarId', selectedCar.carId.toString());
+    }
+    router.push('/credit-card');
+  }
+
+  
+
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
@@ -307,11 +330,16 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
         {selectedCar && showCard && (
           <animated.div style={{ ...cardStyle, ...cardAnimation }}>
             <div onClick={() => handleCardClick()}>
-              <div className="flex justify-between">
+              <div className="flex justify-between ">
                 <h2 className="text-[18px] font-medium mb-2 text-gray-700">
                   {selectedCar.brand} {selectedCar.model}
                 </h2>
-                <h2 className="text-[18px] font-medium mb-2 text-gray-700">
+                <h2
+                  className="text-[18px] font-medium  text-gray-700 mr-4"
+                  style={{
+                    color: categoryColors[selectedCar.category] || "#000000",
+                  }}
+                >
                   {selectedCar.category}
                 </h2>
                 <FaTimes
@@ -320,9 +348,13 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
                     closeCard(); // Sadece kartı kapat
                   }}
                   style={{
+                    position: "absolute",
+                    top: "4px",
+                    right: "4px",
                     cursor: "pointer",
                     color: "gray",
-                    fontSize: "18px",
+                    fontSize: "20px",
+                    
                   }}
                 />
               </div>
@@ -369,26 +401,26 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
 
       {isPopupOpen && (
         <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50"
           onClick={closePopup}
         >
           <div
-            className="bg-white rounded-lg p-6 shadow-lg w-[700px] h-[700px] mb-10 "
+            className="bg-white rounded-lg p-6 shadow-lg w-full max-w-4xl sm:w-[90%] md:w-[80%] lg:w-[700px] xl:w-[700px] h-full sm:h-auto mb-10"
             onClick={(e) => e.stopPropagation()}
           >
             {/* <FaTimes onClick={closePopup} className="text-[18px] absolute " /> */}
 
-            <div className="flex justify-center gap-3 text-[18px] mt-3 ">
+            <div className="flex justify-center gap-3 text-[18px]  ">
               <p>{selectedCar?.brand}</p>
               <p>{selectedCar?.model}</p>
             </div>
 
             {/* Slider Logic Inside Modal */}
             <div>
-              <div className="relative mt-4 flex items-center justify-center">
+              <div className="relative mt-2 flex items-center justify-center">
                 <button
                   onClick={goToPrev}
-                  className="absolute left-0  text-[#002e67]  p-3 z-10 "
+                  className="absolute left-0 text-[#002e67] p-3 z-10 "
                 >
                   <FaChevronLeft size={20} />
                 </button>
@@ -399,7 +431,7 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
                 />
                 <button
                   onClick={goToNext}
-                  className="absolute right-0 text-[#002e67]  p-3 z-10 "
+                  className="absolute right-0 text-[#002e67] p-3 z-10 "
                 >
                   <FaChevronRight size={20} />
                 </button>
@@ -418,9 +450,20 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
               </div>
             </div>
 
-            <div className=" flex justify-around items-center text-[18px] mt-3">
+            <div className="flex justify-around items-center text-[18px] mt-4">
               {/* Car Category */}
-              <p className="ml-[90px]">{selectedCar?.category}</p>
+              {selectedCar?.category ? (
+                <p
+                  className="ml-[76px]"
+                  style={{
+                    color: categoryColors[selectedCar.category] || "#000000",
+                  }}
+                >
+                  {selectedCar.category}
+                </p>
+              ) : (
+                <p>Loading category...</p>
+              )}
 
               <div className="flex items-center border-2 border-gray-700 rounded-md ml-[40px]">
                 <div
@@ -435,9 +478,9 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
                 {/* Plate and TR */}
                 <div className="flex items-center border-2 border-blue-600 rounded-md">
                   {/* "TR" Label with Blue Background */}
-                  <div className="bg-blue-600 text-white px-4 py-2 ">TR</div>
+                  <div className="bg-blue-600 text-white px-4 py-2">TR</div>
                   {/* Car Plate Number */}
-                  <div className=" py-2 mx-3">{selectedCar?.plate}</div>
+                  <div className="py-2 mx-3">{selectedCar?.plate}</div>
                 </div>
               </div>
             </div>
@@ -462,7 +505,7 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
                 </h2>
               </div>
             </div>
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center mb-2">
               {/* Price */}
               <h2 className="ml-[100px] text-[20px] font-bold text-gray-700">
                 <span className="text-[14px] font-normal text-gray-900">
@@ -476,7 +519,7 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
               </h2>
 
               <button
-                onClick={() => router.push("/credit-card")}
+                onClick={goToCreditCardPage}
                 className="mr-[40px] bg-[#002e67] text-white text-[18px] font-medium px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200"
               >
                 Hemen Kirala
@@ -494,8 +537,8 @@ const cardStyle = {
   borderRadius: "8px",
   padding: "16px",
   //margin: " 10px 0px",
-  //height: "330px",
-  width: "230px",
+  height: "auto",
+  width: "250px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   position: "absolute" as "absolute",
   bottom: "40px",

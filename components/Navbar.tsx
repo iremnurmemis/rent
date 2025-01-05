@@ -50,7 +50,7 @@ function Navbar() {
             Cars
           </h2>
         </Link>
-        <Link href="/rents">
+        <Link href="/active-rental">
           <h2 className="hover:bg-[#002e67] px-3 cursor-pointer p-2 rounded-full hover:text-white font-semibold text-[#002e67] text-lg">
             Rents
           </h2>
@@ -68,18 +68,30 @@ function Navbar() {
               <span className="material-icons text-xl">person</span>
             </div>
             <div
-              className="absolute right-0 hidden bg-white border rounded-md shadow-lg w-40 group-hover:block"
+              className="absolute right-0 hidden bg-white border rounded-md shadow-lg w-44 group-hover:block"
               style={{ top: "50px" }}
             >
               <ul>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   <Link href="/profile">Profile</Link>
                 </li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <Link href="/rentals">Sürüş Geçmişim</Link>
+                </li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <Link href="/profile">Ödeme Geçmişim</Link>
+                </li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <Link href="/payment-tool">Ödeme Araçlarım</Link>
+                </li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <Link href="/profile">Ehliyet Bilgilerim</Link>
+                </li>
                 <li
                   onClick={handleLogout}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 >
-                  Logout
+                  Çıkış Yap
                 </li>
               </ul>
             </div>
