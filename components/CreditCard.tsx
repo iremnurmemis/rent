@@ -124,58 +124,76 @@ function CreditCard() {
   };
 
   const handleRentStart = async () => {
-    if(carId){
-       if (selectedCard) {
+    if (carId) {
+      if (selectedCard) {
         console.log("Mevcut kart kullanılıyor:", selectedCard);
         console.log("Seçilen araç ID'si:", carId);
-
+  
         try {
-            // Mevcut kartla kiralama API çağrısı
-            const rental = await  RentService.startRental(carId, user.id, selectedCard.id);
-            console.log("Kiralama işlemi başarılı:", rental);
-            alert("Kiralama işlemi başarılı!");
-            router.push("/active-rental");
+          // Mevcut kartla kiralama API çağrısı
+          const rental = await RentService.startRental(carId, user.id, selectedCard.id);
+          console.log("Kiralama işlemi başarılı:", rental);
+          alert("Kiralama işlemi başarılı!");
+          router.push("/active-rental");
         } catch (error: any) {
-          console.error("Hata detayları:", error.response?.data?.message || error.message);
-      }
-    } else if (showCardForm) {
-        if (!validateNewCard()) return;
-
-        try {
-            const newCard = {
-                cardNumber: newCardNumber,
-                cardHolderName: newCardHolderName,
-                cardType: newCardType,
-                userId: user.id,
-                expireMonth: newExpireMonth,
-                expireYear: newExpireYear,
-                cvc: newCVC,
-            };
-
-            const addedCard = await CreditCardService.addCreditCard(newCard);
-
-            if (addedCard && addedCard.data && addedCard.data.id) {
-                console.log("Yeni kart kullanılıyor:", addedCard.data.id);
-
-                // Yeni kartla kiralama API çağrısı
-                const rental = await RentService.startRental(carId, user.id, addedCard.data.id);
-                console.log("Kiralama işlemi başarılı:", rental);
-                alert("Kiralama işlemi başarılı!");
-                router.push("/active-rental");
-            } else {
-                console.error("Kart eklenirken ID alınamadı:", addedCard);
-            }
-        } catch (error) {
-            console.error("Kart eklenirken hata oluştu:", error);
-            alert("Kart ekleme başarısız!");
+          const errorMessage = error.response?.data?.message || error.message;
+          console.log("Kiralama işlemi sırasında hata oluştu:", errorMessage);
+          if (errorMessage === 'Kiralamaya başlamadan önce Sürücü belgenizi sisteme yüklemelisiniz') {
+            alert("Kiralamaya başlamadan önce Sürücü belgenizi sisteme yüklemelisiniz");
+            router.push("/upload-driverlicence");
+          } else {
+            alert(`Hata: ${errorMessage}`); // Diğer hatalar
+          }
         }
-    } else {
+      } else if (showCardForm) {
+        if (!validateNewCard()) return;
+  
+        try {
+          const newCard = {
+            cardNumber: newCardNumber,
+            cardHolderName: newCardHolderName,
+            cardType: newCardType,
+            userId: user.id,
+            expireMonth: newExpireMonth,
+            expireYear: newExpireYear,
+            cvc: newCVC,
+          };
+  
+          const addedCard = await CreditCardService.addCreditCard(newCard);
+  
+          if (addedCard && addedCard.data && addedCard.data.id) {
+            console.log("Yeni kart kullanılıyor:", addedCard.data.id);
+  
+            try {
+              // Yeni kartla kiralama API çağrısı
+              const rental = await RentService.startRental(carId, user.id, addedCard.data.id);
+              console.log("Kiralama işlemi başarılı:", rental);
+              alert("Kiralama işlemi başarılı!");
+              router.push("/active-rental");
+            } catch (error: any) {
+              const errorMessage = error.response?.data?.message || error.message;
+              console.log("Kiralama işlemi sırasında hata oluştu:", errorMessage);
+              if (errorMessage === 'Kiralamaya başlamadan önce Sürücü belgenizi sisteme yüklemelisiniz') {
+                alert("Kiralamaya başlamadan önce Sürücü belgenizi sisteme yüklemelisiniz");
+                router.push("/upload-driverlicence");
+              } else {
+                alert(`Hata: ${errorMessage}`); // Diğer hatalar
+              }
+            }
+          } else {
+            console.error("Kart eklenirken ID alınamadı:", addedCard);
+            alert("Kart ekleme başarısız!");
+          }
+        } catch (error) {
+          console.error("Kart eklenirken hata oluştu:", error);
+          alert("Kart ekleme başarısız!");
+        }
+      } else {
         alert("Lütfen bir kart seçin veya yeni bir kart ekleyin.");
+      }
     }
-    }
-   
-};
-
+  };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">

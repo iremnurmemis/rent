@@ -50,10 +50,7 @@ export const CreditCardService={
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error('Kart eklenirken hata oluştu:', error.response?.data); // Backend'den dönen detaylı hata mesajı
-        console.error('Hata mesajı:', error.message);
-        console.error('Hata kodu:', error.code);
-        console.error('Hata yanıtı:', error.response);
+        console.log('Kart eklenirken hata oluştu:', error.response?.data); // Backend'den dönen detaylı hata mesajı
       } else {
         console.error('Beklenmedik bir hata oluştu:', error);
       }

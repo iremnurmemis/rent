@@ -85,7 +85,7 @@ function Navbar() {
                   <Link href="/payment-tool">Ödeme Araçlarım</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  <Link href="/profile">Ehliyet Bilgilerim</Link>
+                  <Link href="/driverlicence-info">Ehliyet Bilgilerim</Link>
                 </li>
                 <li
                   onClick={handleLogout}

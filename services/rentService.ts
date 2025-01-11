@@ -68,7 +68,7 @@ export const RentService = {
       );
       return response.data;
     } catch (error: any) {
-      console.error("Kiralama başlatılırken hata oluştu", error.response.data);
+      console.log("Kiralama başlatılırken hata oluştu", error.response.data);
       throw error;
     }
   },
@@ -113,7 +113,7 @@ export const RentService = {
   
       return mappedRentalData;
     } catch (error: any) {
-      console.error(
+      console.log(
         "userın kiralamaları getirilirken hata oldu",
         error.response.data
       );
