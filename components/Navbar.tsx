@@ -76,6 +76,9 @@ function Navbar() {
                   <Link href="/profile">Profile</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <Link href="/balance">Bakiye İşlemleri</Link>
+                </li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   <Link href="/rentals">Sürüş Geçmişim</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">

@@ -30,7 +30,10 @@ export interface CarRental {
   car: Car;
   modelName: string;
   fuelTypeName:string
-  transsmissionName:string
+  transsmissionName:string;
+  rentalType:string;
+  overdueEndDate:string;
+  totalOverdueFee:number;
 }
 
 function mapRentalStatus(status: number): string {
@@ -50,7 +53,9 @@ export const RentService = {
   startRental: async (
     carId: number,
     userId: number,
-    cardId: number
+    cardId: number,
+    rentalType:number,
+    durationInDays:number
   ): Promise<any> => {
     try {
       const response = await axios.post(
@@ -59,6 +64,8 @@ export const RentService = {
           carId,
           userId,
           cardId,
+          rentalType,
+          durationInDays
         },
         {
           headers: {

@@ -9,6 +9,7 @@ export interface CarLocation {
     brandId:number;
     categoryId:number;
     pricePerHour: number;
+    pricePerDay: number;
     model: string;
     seatCount: number;
     transmission: string;

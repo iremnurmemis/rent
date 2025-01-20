@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useUser } from "@/contexts/UserContext";
@@ -27,7 +27,9 @@ function Rentals() {
     return `${day}-${month}-${year}`;
   };
 
-  const calculateRentalDuration = (startDate: string, endDate: string | null) => {
+ 
+
+  const calculateDuration = (startDate: string, endDate: string | null) => {
     const start = new Date(startDate);
     const end = endDate ? new Date(endDate) : new Date();
     const durationInMilliseconds = end.getTime() - start.getTime();
@@ -38,7 +40,7 @@ function Rentals() {
 
     return { hours, minutes };
   };
-
+ 
   useEffect(() => {
     const fetchAllRentals = async () => {
       try {
@@ -74,12 +76,19 @@ function Rentals() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {rentals.map((rental) => {
-            const duration = calculateRentalDuration(rental.startDate, rental.endDate);
-            const categoryColor = categoryColors[rental.categoryName as Category]; // Apply color based on category
+            const duration = calculateDuration(rental.startDate, rental.endDate);
+            const categoryColor = categoryColors[rental.categoryName as Category]; 
+
+            // Aşım Süresini Hesapla
+            let overdueDuration = null;
+            if (rental.endDate && rental.overdueEndDate) {
+              overdueDuration = calculateDuration(rental.endDate, rental.overdueEndDate);
+            }
+
             return (
               <div key={rental.id} className="bg-white p-6 rounded-lg shadow-lg hover:scale-105 transform transition duration-300">
                 <h2 className="text-2xl font-bold mb-4 flex items-center">
-                  <FaCar className="mr-2" style={{ color: categoryColor }} /> {/* Only the car icon changes color */}
+                  <FaCar className="mr-2" style={{ color: categoryColor }} />
                   <span className="text-gray-900">{rental.brandName} {rental.modelName} ({rental.car.year})</span>
                 </h2>
                 <div className="mb-4">
@@ -91,7 +100,20 @@ function Rentals() {
                 <div className="mb-4">
                   <p className="flex items-center"><FaCalendarAlt className="mr-2 text-gray-600" /> <strong>Başlangıç Tarihi:</strong> {formatDate(rental.startDate)}</p>
                   <p className="flex items-center"><FaCalendarAlt className="mr-2 text-gray-600" /> <strong>Bitiş Tarihi:</strong> {rental.endDate ? formatDate(rental.endDate) : "N/A"}</p>
+                  <p><strong>Kiralama Türü:</strong> {rental.rentalType} </p>
                   <p><strong>Geçen Süre:</strong> {duration.hours} saat {duration.minutes} dakika</p>
+                  {rental.rentalType === "Daily" && (
+                    <div>
+                      {overdueDuration ? (
+                        <>
+                          <p><strong>Aşım Süresi:</strong> {overdueDuration.hours} saat {overdueDuration.minutes} dakika</p>
+                          <p><strong>Aşım Ücreti:</strong> {rental.totalOverdueFee} TL</p>
+                        </>
+                      ) : (
+                        <p><strong>Aşım Bilgisi:</strong> Aşım bilgisi yoktur.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="mb-4">  
                   <p className="flex items-center"><FaMapMarkerAlt className="mr-2 text-gray-600" /> <strong>Başlangıç Konumu:</strong> {`(${rental.startLatitude}, ${rental.startLongitude})`}</p>

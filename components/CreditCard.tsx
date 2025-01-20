@@ -17,6 +17,12 @@ function CreditCard() {
   const carIdString = localStorage.getItem('selectedCarId');
   const carId = carIdString ? parseInt(carIdString, 10) : null;
 
+  const storedRentalType = localStorage.getItem('rentalType');
+  const rentaltype = storedRentalType ? parseInt(storedRentalType, 10) : null;
+  
+  const storedDurationInDays = localStorage.getItem('durationInDays');
+  const durationday = storedDurationInDays ? parseInt(storedDurationInDays, 10) : null;
+
   const [creditCards, setCreditCard] = useState<CreditCardDetail[]>([]);
   const [selectedCard, setSelectedCard] = useState<CreditCardDetail | null>(
     null
@@ -124,14 +130,18 @@ function CreditCard() {
   };
 
   const handleRentStart = async () => {
-    if (carId) {
+    console.log(durationday);
+    console.log(rentaltype);
+    console.log(carId);
+    if (carId && rentaltype!=null && durationday!=null) {
+      console.log("Tüm değerler geçerli, kiralama başlatılabilir.");
       if (selectedCard) {
         console.log("Mevcut kart kullanılıyor:", selectedCard);
         console.log("Seçilen araç ID'si:", carId);
   
         try {
           // Mevcut kartla kiralama API çağrısı
-          const rental = await RentService.startRental(carId, user.id, selectedCard.id);
+          const rental = await RentService.startRental(carId, user.id, selectedCard.id,rentaltype, rentaltype === 1 ? durationday : 0);
           console.log("Kiralama işlemi başarılı:", rental);
           alert("Kiralama işlemi başarılı!");
           router.push("/active-rental");
@@ -166,7 +176,7 @@ function CreditCard() {
   
             try {
               // Yeni kartla kiralama API çağrısı
-              const rental = await RentService.startRental(carId, user.id, addedCard.data.id);
+              const rental = await RentService.startRental(carId, user.id, addedCard.data.id,rentaltype,rentaltype==1?durationday:0);
               console.log("Kiralama işlemi başarılı:", rental);
               alert("Kiralama işlemi başarılı!");
               router.push("/active-rental");

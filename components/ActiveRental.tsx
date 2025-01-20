@@ -42,6 +42,7 @@ function ActiveRental() {
 
   useEffect(() => {
     const fetchActiveRental = async () => {
+      console.log("iremmmm", activeRental?.rentalType);
       try {
         const response = await RentService.getUserActiveRentals(user.id);
 
@@ -76,9 +77,7 @@ function ActiveRental() {
           error?.response?.data?.message || "İşlem tamamlanamadı.";
         console.log("Hata oluştu:", errorMessage);
 
-        showErrorAlert(
-          "İade işlemi gerçekleştirilemedi. Lütfen başka bir kart seçiniz ya da bakiye yükleyiniz"
-        );
+        showErrorAlert(`${errorMessage}`);
       }
     }
   };
@@ -127,28 +126,60 @@ function ActiveRental() {
     alertDiv.style.alignItems = "center";
     alertDiv.style.maxWidth = "500px";
 
-    const changeCardButton = document.createElement("button");
-    changeCardButton.textContent = "Kart Seç";
-    changeCardButton.style.marginTop = "10px";
-    changeCardButton.style.padding = "10px 20px";
-    changeCardButton.style.backgroundColor = "white";
-    changeCardButton.style.color = "red";
-    changeCardButton.style.border = "1px solid red";
-    changeCardButton.style.borderRadius = "5px";
-    changeCardButton.style.cursor = "pointer";
+    // Eğer rentaltype 1 ise "Kart Seç" butonunu ekleme
+    if (activeRental?.rentalType !== "Daily") {
+      const changeCardButton = document.createElement("button");
+      changeCardButton.textContent = "Kart Seç";
+      changeCardButton.style.marginTop = "10px";
+      changeCardButton.style.padding = "10px 20px";
+      changeCardButton.style.backgroundColor = "white";
+      changeCardButton.style.color = "red";
+      changeCardButton.style.border = "1px solid red";
+      changeCardButton.style.borderRadius = "5px";
+      changeCardButton.style.cursor = "pointer";
 
-    changeCardButton.onclick = () => {
-      alertDiv.remove(); 
-      router.push("/credit-card");
-    };
+      changeCardButton.onclick = () => {
+        alertDiv.remove();
+        router.push("/credit-card");
+      };
 
-    alertDiv.appendChild(changeCardButton);
+      alertDiv.appendChild(changeCardButton);
+    }
 
     document.body.appendChild(alertDiv);
 
     setTimeout(() => {
       alertDiv.remove();
     }, 5000);
+  };
+
+  const calculateOverdueFee = (
+    pricePerHour: number,
+    endDate: string | null
+  ) => {
+    const now = new Date();
+    const end = endDate ? new Date(endDate) : now;
+
+    // Geçen süreyi hesapla
+    const durationInMilliseconds = now.getTime() - end.getTime();
+    const durationInMinutes = Math.max(
+      Math.floor(durationInMilliseconds / (1000 * 60)),
+      0
+    );
+
+    // Aşım süresi
+    const overdueHours = Math.floor(durationInMinutes / 60);
+    const overdueMinutes = durationInMinutes % 60;
+
+    // Aşım ücreti (sadece aşım süresi 1 saatten büyükse hesaplanır)
+    const overdueFee = overdueHours > 0 ? overdueHours * pricePerHour : 0;
+
+    return {
+      overdueHours,
+      overdueMinutes,
+      overdueFee,
+      display: `${overdueHours} saat ${overdueMinutes} dakika`,
+    };
   };
 
   return (
@@ -198,6 +229,9 @@ function ActiveRental() {
                 Tarih ve Fiyat Bilgileri
               </h3>
               <p>
+                <strong>Kiralama Türü:</strong> {activeRental.rentalType}
+              </p>
+              <p>
                 <strong>Başlangıç Tarihi:</strong>{" "}
                 {formatDate(activeRental.startDate)}
               </p>
@@ -219,17 +253,56 @@ function ActiveRental() {
               <p>
                 <strong>Toplam Fiyat:</strong> {activeRental.totalPrice} TL
               </p>
-              {activeRental.car.pricePerHour && activeRental.startDate && (
-                <p>
-                  <strong>Tahmini Toplam Fiyat:</strong>
-                  {calculateEstimatedPrice(
-                    activeRental.car.pricePerHour,
-                    calculateRentalDuration(activeRental.startDate)
-                      .durationInMinutes
-                  )}{" "}
-                  TL
-                </p>
-              )}
+
+              {/* rentaltype 1 ise aşım süresi ve ücreti göster */}
+              {activeRental &&
+                activeRental.rentalType === "Daily" &&
+                activeRental.endDate && (
+                  <div>
+                    <h4 className="mt-4 text-lg font-semibold">
+                      Aşım Bilgileri
+                    </h4>
+                    {calculateOverdueFee(
+                      activeRental.car.pricePerHour,
+                      activeRental.endDate
+                    ).overdueHours === 0 &&
+                    calculateOverdueFee(
+                      activeRental.car.pricePerHour,
+                      activeRental.endDate
+                    ).overdueMinutes === 0 ? (
+                      <p>Henüz aşım bilgisi oluşmamıştır.</p>
+                    ) : (
+                      <>
+                        <p>
+                          <strong>Aşım Süresi:</strong>{" "}
+                          {
+                            calculateOverdueFee(
+                              activeRental.car.pricePerHour,
+                              activeRental.endDate
+                            ).display
+                          }
+                        </p>
+                        {calculateOverdueFee(
+                          activeRental.car.pricePerHour,
+                          activeRental.endDate
+                        ).overdueFee > 0 ? (
+                          <p>
+                            <strong>Aşım Ücreti:</strong>{" "}
+                            {
+                              calculateOverdueFee(
+                                activeRental.car.pricePerHour,
+                                activeRental.endDate
+                              ).overdueFee
+                            }{" "}
+                            TL
+                          </p>
+                        ) : (
+                          <p>Henüz aşım ücreti oluşmamıştır.</p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
             </div>
           </div>
           <div className="text-center mt-6">
