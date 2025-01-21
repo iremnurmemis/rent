@@ -32,14 +32,13 @@ function ActiveRental() {
     return { hours, minutes, durationInMinutes };
   };
 
-  const calculateEstimatedPrice = (
-    pricePerHour: number,
-    durationInMinutes: number
-  ) => {
-    const durationInHours = Math.ceil(durationInMinutes / 60);
-    return pricePerHour * durationInHours;
+  const calculateEstimatedPrice = (pricePerHour: number, durationInMinutes: number) => {
+    const durationInHours = durationInMinutes / 60; // Süreyi saat cinsine çevir
+    const totalPrice = durationInHours * pricePerHour; 
+    return totalPrice; 
   };
-
+  
+  
   useEffect(() => {
     const fetchActiveRental = async () => {
       console.log("iremmmm", activeRental?.rentalType);
@@ -61,6 +60,7 @@ function ActiveRental() {
     }
   }, [user]);
 
+  
   const handleEndRental = async (rentalId: number) => {
     if (activeRental) {
       try {
@@ -140,7 +140,7 @@ function ActiveRental() {
 
       changeCardButton.onclick = () => {
         alertDiv.remove();
-        router.push("/credit-card");
+        router.push("/credit-card-select");
       };
 
       alertDiv.appendChild(changeCardButton);
@@ -251,8 +251,20 @@ function ActiveRental() {
                 TL
               </p>
               <p>
-                <strong>Toplam Fiyat:</strong> {activeRental.totalPrice} TL
-              </p>
+  <strong>Toplam Fiyat:</strong>{" "}
+  {activeRental.rentalType === "Daily" ? (
+    activeRental.totalPrice // Assuming totalPrice is available in the rental data
+  ) : (
+    calculateEstimatedPrice(
+      activeRental.car.pricePerHour,
+      calculateRentalDuration(activeRental.startDate).durationInMinutes
+    )
+  )}{" "}
+  TL
+</p>
+
+
+
 
               {/* rentaltype 1 ise aşım süresi ve ücreti göster */}
               {activeRental &&

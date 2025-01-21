@@ -532,6 +532,7 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
       localStorage.setItem("selectedCarId", selectedCar.carId.toString());
       localStorage.setItem('rentalType', rentalType === "Hourly" ? "0" : "1");
       localStorage.setItem('durationInDays', rentalType === "Daily" ? durationInDays.toString() : "0");
+      
     }
     router.push("/credit-card");
   };
@@ -545,8 +546,21 @@ const Map: React.FC<MapProps> = ({ userLocation, carLocations }) => {
       alert("Günlük kiralamada geçerli bir gün sayısı giriniz!");
       return;
     }
+  
+    // Calculate the total cost for the rental (based on rental type)
+    let totalCost = 0;
+  
+    if (rentalType === "Hourly") {
+      totalCost = selectedCar?.pricePerHour || 0; // You can add logic to handle the hour-based rental cost
+    } else if (rentalType === "Daily") {
+      totalCost = (selectedCar?.pricePerDay || 0) * durationInDays;
+    }
+  
+    // Store the calculated cost and other information before redirecting
+    localStorage.setItem("totalRentalCost", totalCost.toString());
     goToCreditCardPage();
   };
+  
 
   return (
     <div

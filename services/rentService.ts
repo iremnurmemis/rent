@@ -55,7 +55,8 @@ export const RentService = {
     userId: number,
     cardId: number,
     rentalType:number,
-    durationInDays:number
+    durationInDays:number,
+    useBalance:boolean
   ): Promise<any> => {
     try {
       const response = await axios.post(
@@ -65,7 +66,8 @@ export const RentService = {
           userId,
           cardId,
           rentalType,
-          durationInDays
+          durationInDays,
+          useBalance
         },
         {
           headers: {
