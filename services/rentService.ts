@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CarImage } from "./carLocationService";
 
 export enum RentalStatus {
   Active = "Active",
@@ -29,11 +30,29 @@ export interface CarRental {
   categoryName: string;
   car: Car;
   modelName: string;
-  fuelTypeName:string
-  transsmissionName:string;
+  fuelTypeName: string;
+  transsmissionName: string;
+  rentalType: string;
+  overdueEndDate: string;
+  totalOverdueFee: number;
+  rentalImages: CarImage[];
+  durationInDays:number;
+}
+
+
+export interface AdminCarRental{
+  id: number;
+  carId: number;
+  userId: number;
+  startDate: string;
+  endDate: string;
+  totalPrice: number;
+  startLatitude: number;
+  startLongitude: number;
+  endLatitude: number;
+  endLongitude: number;
+  rentalStatus: number;
   rentalType:string;
-  overdueEndDate:string;
-  totalOverdueFee:number;
 }
 
 function mapRentalStatus(status: number): string {
@@ -116,9 +135,9 @@ export const RentService = {
       const mappedRentalData = rentalData.map((rental: any) => ({
         ...rental,
         rentalStatus: mapRentalStatus(rental.rentalStatus),
+        rentalImages: rental.rentalImages || [],
       }));
-
-      //console.log(mappedRentalData)
+    
   
       return mappedRentalData;
     } catch (error: any) {
@@ -130,22 +149,54 @@ export const RentService = {
     }
   },
 
-  endRental: async (rentalId: number): Promise<any> => {
+  getRentalById: async (rentalId: number): Promise<CarRental> => {
     try {
-      console.log("API'ye gönderilen rentalId:", rentalId); // Debug için log
-      const response = await axios.post(
-        `http://localhost:5153/api/CarRentals/CompleteCarRental`,
-        { rentalId },
+      const response = await axios.get(
+        `http://localhost:5153/api/CarRentals/GetCarRentalById`,
         {
-          headers: { "Content-Type": "application/json" },
+          params: {rentalId },
         }
       );
-      return response.data;
+
+      const rentalData = response.data.data;
+      const mappedRentalData = {
+        ...rentalData,
+        rentalStatus: mapRentalStatus(rentalData.rentalStatus),
+        rentalImages: rentalData.rentalImages || [],
+      };  
+  
+      return mappedRentalData;
     } catch (error: any) {
-      console.log("Kiralama sonlandırılırken hata oluştu", error?.response?.data || error.message);
+      console.log(
+        "kiralama bilgisi getirilirken hata oldu",
+        error.response.data
+      );
       throw error;
     }
   },
+
+
+   endRental : async (formData: FormData, rentalId: number): Promise<any> => {
+    try {
+        console.log("API'ye gönderilen formData:", formData); // Debug için log
+        // FormData'ya rentalId'yi ekleyin
+        formData.append("rentalId", rentalId.toString());
+        
+        // API'ye gönderim
+        const response = await axios.post(
+            "http://localhost:5153/api/CarRentals/CompleteCarRental", // URL'de rentalId yok, formData içinde
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },  // multipart/form-data header'ı kullanıyoruz
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.log("Kiralama sonlandırılırken hata oluştu", error?.response?.data || error.message);
+        throw error;
+    }
+  },
+  
 
   updateRentalCardId:async(cardId:number,rentalId:number):Promise<any> => {
     try {
@@ -162,6 +213,22 @@ export const RentService = {
       console.log("Kiralama nesnesinin cardıd si update olurken hata oluştu", error?.response?.data || error.message);
       throw error;
     }
+  },
+
+  getAllRentals:async():Promise<AdminCarRental[]> =>{
+    try {
+     
+      const response = await axios.get(
+        `http://localhost:5153/api/CarRentals/GetAllRentals`,
+      
+      );
+      const rentalData=response.data.data;
+      return rentalData;
+    } catch (error: any) {
+      console.log("Kiralamalar getirilirken bir hata oldu.", error?.response?.data || error.message);
+      throw error;
+    }
+
   }
   
 };

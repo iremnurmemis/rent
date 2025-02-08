@@ -33,6 +33,19 @@ export function mapRentalStatus(status: number): string {
       created:string
   }
 
+  export interface PaymentDetail{
+    id:number,
+    cardNumber:string,
+    userId:number,
+    rentalId:number,
+    status:string,
+    carId:number,
+    created:string,
+    totalPrice:number,
+    balancePackageId:number,
+    paymentType:string,
+  }
+
 export const PaymentService = {
     getUserPayments: async (userId: number): Promise<Payment[]> => {
        try {
@@ -53,5 +66,23 @@ export const PaymentService = {
          throw error;
        }
      },
+
+     getAllPayments: async(): Promise<PaymentDetail[]> => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5153/api/Payments/GetPaymentsFront`,
+        
+        );
+        
+        const paymentsData = response.data;    
+        return paymentsData;
+      } catch (error: any) {
+        console.error(
+          "Ödeme bilgileri getirilirken hata oldu",
+          error.response.data
+        );
+        throw error;
+      }
+    },
    
 };

@@ -11,6 +11,7 @@ function Login() {
   const [backendError, setBackendError] = useState("");
   const router = useRouter();
   const { login: setUser } = useUser();
+  const { user } = useUser();
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -38,7 +39,13 @@ function Login() {
       const userData = await login(values.email, values.password);
       setUser(userData);
       alert("Giriş başarılı");
-      router.push("/");
+      console.log(user);
+
+      if (userData.operationClaimId === 2) {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
+      }
 
       setTimeout(() => {
         values.email = "";
@@ -139,15 +146,28 @@ function Login() {
                   {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
                 </button>
 
-                <p className="text-center text-base mt-4 text-gray-800">
-                  Hesabınız yok mu?{" "}
-                  <a
-                    href="/signUp"
-                    className="text-[#002E67] font-medium hover:underline"
-                  >
-                    Kaydol
-                  </a>
-                </p>
+                <div className="flex flex-col gap-1">
+                  {" "}
+                  {/* Adjust the gap value */}
+                  <p className="text-center text-base text-gray-800">
+                    Hesabınız yok mu?{" "}
+                    <a
+                      href="/signUp"
+                      className="text-[#002E67] font-medium hover:underline"
+                    >
+                      Kaydol
+                    </a>
+                  </p>
+                  {/* Şifremi Unuttum Bağlantısı */}
+                  <div className="text-center">
+                    <a
+                      href="/forgot-password"
+                      className="text-[#002E67] font-medium hover:underline"
+                    >
+                      Şifremi Unuttum
+                    </a>
+                  </div>
+                </div>
               </div>
             </Form>
           )}

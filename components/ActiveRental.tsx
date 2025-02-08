@@ -9,6 +9,9 @@ function ActiveRental() {
   const { user } = useUser();
   const router = useRouter();
   const [activeRental, setActiveRental] = useState<null | CarRental>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const [isImageUploadVisible, setIsImageUploadVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -32,13 +35,15 @@ function ActiveRental() {
     return { hours, minutes, durationInMinutes };
   };
 
-  const calculateEstimatedPrice = (pricePerHour: number, durationInMinutes: number) => {
+  const calculateEstimatedPrice = (
+    pricePerHour: number,
+    durationInMinutes: number
+  ) => {
     const durationInHours = durationInMinutes / 60; // Süreyi saat cinsine çevir
-    const totalPrice = durationInHours * pricePerHour; 
-    return totalPrice; 
+    const totalPrice = durationInHours * pricePerHour;
+    return totalPrice;
   };
-  
-  
+
   useEffect(() => {
     const fetchActiveRental = async () => {
       console.log("iremmmm", activeRental?.rentalType);
@@ -60,27 +65,51 @@ function ActiveRental() {
     }
   }, [user]);
 
-  
-  const handleEndRental = async (rentalId: number) => {
-    if (activeRental) {
-      try {
-        const response = await RentService.endRental(rentalId);
-        console.log("Kiralama tamamlandı:", response);
-        showSuccessAlert(
-          "İade işlemi tamamlandı. Bizi tercih ettiğiniz için teşekkürler!",
-          () => {
-            router.push("/");
-          }
-        );
-      } catch (error: any) {
-        const errorMessage =
-          error?.response?.data?.message || "İşlem tamamlanamadı.";
-        console.log("Hata oluştu:", errorMessage);
-
-        showErrorAlert(`${errorMessage}`);
+  // Fotoğraf yükleme işlemi
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      if (files.length <= 4) {
+        // Maksimum 4 fotoğraf
+        setImages(files);
+      } else {
+        alert("Lütfen sadece 4 fotoğraf yükleyin.");
       }
     }
   };
+
+  
+  const handleEndRental = async (rentalId: number) => {
+    if (!isImageUploadVisible) {
+      setIsImageUploadVisible(true); 
+      return;
+    }
+
+    if (images.length !== 4) {
+      alert("Lütfen 4 adet fotoğraf yükleyin.");
+      return;
+    }
+
+    if (isSubmitting) return; // Çift istek atılmasını engelle
+    setIsSubmitting(true);
+
+    const formData = new FormData();
+    images.forEach((image) => formData.append("images", image));
+
+    try {
+      await RentService.endRental(formData, rentalId);
+      showSuccessAlert("İade işlemi tamamlandı. Bizi tercih ettiğiniz için teşekkürler!", () => {
+        router.push("/");
+      });
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || "İşlem tamamlanamadı.";
+      showErrorAlert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
 
   const showSuccessAlert = (message: string, onClose?: () => void) => {
     const alertDiv = document.createElement("div");
@@ -251,20 +280,16 @@ function ActiveRental() {
                 TL
               </p>
               <p>
-  <strong>Toplam Fiyat:</strong>{" "}
-  {activeRental.rentalType === "Daily" ? (
-    activeRental.totalPrice // Assuming totalPrice is available in the rental data
-  ) : (
-    calculateEstimatedPrice(
-      activeRental.car.pricePerHour,
-      calculateRentalDuration(activeRental.startDate).durationInMinutes
-    )
-  )}{" "}
-  TL
-</p>
-
-
-
+                <strong>Toplam Fiyat:</strong>{" "}
+                {activeRental.rentalType === "Daily"
+                  ? activeRental.totalPrice // Assuming totalPrice is available in the rental data
+                  : calculateEstimatedPrice(
+                      activeRental.car.pricePerHour,
+                      calculateRentalDuration(activeRental.startDate)
+                        .durationInMinutes
+                    )}{" "}
+                TL
+              </p>
 
               {/* rentaltype 1 ise aşım süresi ve ücreti göster */}
               {activeRental &&
@@ -316,14 +341,32 @@ function ActiveRental() {
                   </div>
                 )}
             </div>
+
           </div>
+
+          {isImageUploadVisible && (
+            <div className="mt-6">
+              <h3 className="text-xl font-semibold mb-4">İade için Aracın Fotoğraflarını Yükleyin</h3>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+                className="border p-2 rounded"
+              />
+              <div className="mt-4">
+                <p>Toplam {images.length} fotoğraf seçildi.</p>
+              </div>
+            </div>
+          )}
           <div className="text-center mt-6">
-            <button
-              onClick={() => handleEndRental(activeRental?.id)}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none"
-            >
-              Kiralamayı Sonlandır
-            </button>
+          <button
+            onClick={() => handleEndRental(activeRental.id)}
+            disabled={isSubmitting}
+            className="mt-6 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Kiralamayı Sonlandır
+          </button>
           </div>
         </div>
       ) : (
