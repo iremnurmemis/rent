@@ -18,14 +18,22 @@ function RentalsPage() {
       try {
         const response = await RentService.getAllRentals();
         console.log(response);
-        setRentals(response);
+  
+        // Tarihe göre eski tarihten yeniye sıralama
+        const sortedRentals = response.sort(
+          (a: AdminCarRental, b: AdminCarRental) =>
+            new Date(a.endDate).getTime() - new Date(b.endDate).getTime()
+        );
+  
+        setRentals(sortedRentals);
       } catch (error) {
         console.error("Error fetching rentals:", error);
       }
     };
-
+  
     fetchRentals();
   }, []);
+  
 
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -100,8 +108,9 @@ function RentalsPage() {
                 <td className="px-6 py-3">{rental.carId}</td>
                 <td className="px-6 py-3">{rental.userId}</td>
                 <td className="px-6 py-3 font-semibold">
-                  {rental.totalPrice.toFixed(2)} ₺
-                </td>
+  {rental.totalPrice?.toFixed(2) ?? "0.00"} ₺
+</td>
+
                 <td className="px-6 py-3">{formatDate(rental.startDate)}</td>
                 <td className="px-6 py-3">{formatDate(rental.endDate)}</td>
                 <td className="px-6 py-3">

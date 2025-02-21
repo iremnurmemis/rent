@@ -4,17 +4,20 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 const UserContext = createContext({
   user: null as any,
   login: (userInfo: any) => {},
-  logout: () => {}
+  logout: () => {},
+  loading:true
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
+  const[loading,setLoading]=useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    setLoading(false);
   }, []);
 
   const login = (userInfo: any) => {
@@ -28,7 +31,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, login, logout,loading }}>
       {children}
     </UserContext.Provider>
   );

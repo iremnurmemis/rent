@@ -120,14 +120,25 @@ export const CarService = {
         data: CarDetail[];
         success: boolean;
         message: string;
-      }>("http://localhost:5153/api/Cars/GetAllDetails");
+      }>("http://localhost:5153/api/Cars/GetAllDetails", {
+        withCredentials: true, 
+      });
   
-      return response.data.data; 
+      return response.data.data;
     } catch (error) {
       console.log("Araçlar getirilirken hata oluştu:", error);
-      throw error; 
+        
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 403) {
+          throw new Error("Bu işlemi gerçekleştirebilmek için yeterli yetkiniz bulunmamaktadır.");
+        }
+      }
+  
+      throw new Error("Araçlar getirilirken bir hata oluştu. Lütfen tekrar deneyin.");
     }
   },
+  
+  
 
   async getCar(carId: number): Promise<CarDetail> {
     try {

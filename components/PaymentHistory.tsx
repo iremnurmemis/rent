@@ -13,14 +13,7 @@ function PaymentHistory() {
       try {
         const response = await PaymentService.getUserPayments(user.id);
         if (response) {
-          const mappedPayments = response
-            .map((payment) => ({
-              ...payment,
-              status: mapRentalStatus(parseInt(payment.status)),
-            }))
-            .sort(
-              (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
-            );
+          const mappedPayments = response.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
           setPayments(mappedPayments);
         } else {
           setPayments(null);

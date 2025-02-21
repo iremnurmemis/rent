@@ -167,15 +167,11 @@ function CreditCard() {
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || error.message;
           console.log("Kiralama işlemi sırasında hata oluştu:", errorMessage);
-          if (
-            errorMessage ===
-            "Kiralamaya başlamadan önce Sürücü belgenizi sisteme yüklemelisiniz"
-          ) {
-            alert(
-              "Kiralamaya başlamadan önce Sürücü belgenizi sisteme yüklemelisiniz"
-            );
-            router.push("/upload-driverlicence");
-          } else {
+          if (errorMessage.includes("Sürücü belgenizi sisteme yüklemelisiniz")) {
+            alert("Kiralamaya başlamadan önce Sürücü belgenizi sisteme yüklemelisiniz");
+            await router.push("/upload-driverlicence");
+          }
+          else {
             alert(`Hata: ${errorMessage}`); // Diğer hatalar
           }
         }

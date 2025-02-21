@@ -19,6 +19,27 @@ export const login = async (email, password) => {
   }
 };
 
+
+export const adminLogin = async (email, password) => {
+  const loginData = { email, password };
+
+  try {
+      const response = await axios.post("http://localhost:5153/api/Auths/admin/login", loginData, {
+          withCredentials: true,
+      });
+      return response.data;
+  } catch (error) {
+      if (error.response) {
+          throw new Error(error.response.data.message || 'Bir hata oluştu');
+      } else if (error.request) {
+          throw new Error('Sunucuya bağlanılamadı');
+      } else {
+          throw new Error(error.message || 'Bir hata oluştu');
+      }
+  }
+};
+
+
 export const signUp = async (email, password, firstName, lastName, phoneNumber) => {
   const signUpData = { email, password, firstName, lastName, phoneNumber };
 
