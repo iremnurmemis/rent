@@ -50,7 +50,7 @@ export default function Sidebar() {
       <div>
         <nav className="flex flex-col gap-2 px-6 py-4">
           <Link
-            href="/dashboard"
+            href="/admin/dashboard"
             className="hover:bg-[#006AFF] hover:border-l-2 hover:border-[#FFFFFF] px-4 py-2 rounded-sm transition flex items-center gap-2"
           >
             <RxDashboard className="w-6 h-6" />
